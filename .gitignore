@@ -2,6 +2,7 @@ CLAUDE.md
 wrangler.toml
 template.yaml
 
+
 progame/
 # Logs
 logs
@@ -93,7 +94,8 @@ test-new-protocols.js
 test-screenshots/
 .wrangler/
 .ace-tool/
-
+.agent/
+.shared/
 # Docker (Closed Source)
 docker/
 data/
