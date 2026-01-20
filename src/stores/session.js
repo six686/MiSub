@@ -13,30 +13,33 @@ export const useSessionStore = defineStore('session', () => {
   const isConfigReady = ref(false);
 
   async function checkSession() {
-    // Parallel fetch of initial data (auth check) and public config
-    const [dataResult, pConfigResult] = await Promise.all([
-      fetchInitialData(),
-      fetchPublicConfig()
-    ]);
+    try {
+      // Parallel fetch of initial data (auth check) and public config
+      const [dataResult, pConfigResult] = await Promise.all([
+        fetchInitialData(),
+        fetchPublicConfig()
+      ]);
 
-    // Update public config
-    if (pConfigResult.success) {
-      publicConfig.value = pConfigResult.data;
-    } else {
-      // Fallback to default if fetch fails
-      publicConfig.value = { enablePublicPage: false };
-    }
-    isConfigReady.value = true;
+      // Update public config
+      if (pConfigResult.success) {
+        publicConfig.value = pConfigResult.data;
+      } else {
+        // Fallback to default if fetch fails
+        publicConfig.value = { enablePublicPage: false };
+      }
+      isConfigReady.value = true;
 
-    if (dataResult.success) {
-      initialData.value = dataResult.data;
+      if (dataResult.success) {
+        initialData.value = dataResult.data;
 
-      // 直接注入数据到 dataStore，避免 Dashboard 重复请求
-      const dataStore = useDataStore();
-      dataStore.hydrateFromData(dataResult.data);
+        // 直接注入数据到 dataStore，避免 Dashboard 重复请求
+        const dataStore = useDataStore();
+        dataStore.hydrateFromData(dataResult.data);
 
-      sessionState.value = 'loggedIn';
-    } else {
+        sessionState.value = 'loggedIn';
+        return true;
+      }
+
       // Auth failed or other error
       if (dataResult.errorType === 'auth') {
         sessionState.value = 'loggedOut';
@@ -45,23 +48,32 @@ export const useSessionStore = defineStore('session', () => {
         console.error("Session check failed:", dataResult.error);
         sessionState.value = 'loggedOut';
       }
+      return false;
+    } catch (error) {
+      console.error('Session check failed unexpectedly:', error);
+      sessionState.value = 'loggedOut';
+      return false;
     }
   }
 
   async function login(password) {
     const result = await apiLogin(password);
     if (result.success) {
-      handleLoginSuccess();
-      // 登录成功后跳转到首页 (HomeView will show Dashboard)
-      router.push({ path: '/' });
+      const success = await handleLoginSuccess();
+      if (success) {
+        // 登录成功后跳转到首页 (HomeView will show Dashboard)
+        await router.push({ path: '/' });
+      } else {
+        throw new Error('登录后校验失败，请稍后重试');
+      }
     } else {
       throw new Error(result.error || '登录失败');
     }
   }
 
-  function handleLoginSuccess() {
+  async function handleLoginSuccess() {
     sessionState.value = 'loading';
-    checkSession();
+    return checkSession();
   }
 
   async function logout() {
