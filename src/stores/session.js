@@ -10,6 +10,7 @@ export const useSessionStore = defineStore('session', () => {
   const sessionState = ref('loading'); // loading, loggedIn, loggedOut
   const initialData = ref(null);
   const publicConfig = ref({ enablePublicPage: true }); // Default true until fetched
+  const isConfigReady = ref(false);
 
   async function checkSession() {
     // Parallel fetch of initial data (auth check) and public config
@@ -25,6 +26,7 @@ export const useSessionStore = defineStore('session', () => {
       // Fallback to default if fetch fails
       publicConfig.value = { enablePublicPage: false };
     }
+    isConfigReady.value = true;
 
     if (dataResult.success) {
       initialData.value = dataResult.data;
@@ -79,5 +81,5 @@ export const useSessionStore = defineStore('session', () => {
     router.push({ path: '/' });
   }
 
-  return { sessionState, initialData, publicConfig, checkSession, login, logout };
+  return { sessionState, initialData, publicConfig, isConfigReady, checkSession, login, logout };
 });

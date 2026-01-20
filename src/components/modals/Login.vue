@@ -68,6 +68,7 @@ const submitLogin = async () => {
             type="password"
             placeholder="Access Token"
             :disabled="isLoading"
+            aria-label="访问口令"
             class="w-full bg-transparent border border-gray-200 dark:border-white/20 rounded-xl py-3.5 pl-11 pr-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-1 focus:ring-primary-500/50 dark:focus:ring-primary-400/50 outline-none transition-all duration-300 disabled:opacity-50"
           />
           <p v-if="error" class="absolute -bottom-6 left-1 text-xs text-red-500 font-medium">{{ error }}</p>
