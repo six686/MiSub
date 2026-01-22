@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import SubConverterSelector from '@/components/forms/SubConverterSelector.vue';
+import Switch from '@/components/ui/Switch.vue';
 
 const props = defineProps({
   settings: {
@@ -71,11 +72,35 @@ async function testSubconverter() {
       </div>
     </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div
+        class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-700 rounded-xl">
+        <div>
+          <p class="text-sm font-medium text-gray-900 dark:text-gray-200">禁用证书校验（scv）</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">仅在订阅源证书异常时启用，开启后存在安全风险</p>
+        </div>
+        <Switch v-model="settings.subConverterScv" />
+      </div>
+      <div
+        class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-700 rounded-xl">
+        <div>
+          <p class="text-sm font-medium text-gray-900 dark:text-gray-200">启用 UDP</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">默认关闭，按需开启以避免兼容性问题</p>
+        </div>
+        <Switch v-model="settings.subConverterUdp" />
+      </div>
+    </div>
+
     <!-- 测试按钮区域 -->
     <div class="border-t border-gray-100 dark:border-gray-700 pt-4">
       <div class="flex items-center gap-4 flex-wrap">
-        <button @click="testSubconverter" :disabled="isTesting || !settings.subConverter"
-          class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+        <button
+          type="button"
+          @click="testSubconverter"
+          :disabled="isTesting || !settings.subConverter"
+          class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+          aria-label="测试 SubConverter 可用性"
+        >
           <svg v-if="isTesting" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
             viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
